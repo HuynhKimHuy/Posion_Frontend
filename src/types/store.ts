@@ -5,7 +5,7 @@ export interface authState {
     loading: boolean,
     signUp: (userName: string, password: string, email: string, firstName: string, lastName: string) => Promise<void>
 
-    signIn: (email: string, password: string) => Promise<void>
+    signIn: (email: string, password: string) => Promise<boolean>
 
     clearState: () => void
 

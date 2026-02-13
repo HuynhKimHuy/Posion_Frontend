@@ -39,8 +39,10 @@ export function SigninForm({
 
   const onSubmit = async (data: SignupFormValues) => {
     const {email , password} = data
-    await signIn(email, password)
-    navigate('/')
+    const isSignedIn = await signIn(email, password)
+    if (isSignedIn) {
+      navigate('/')
+    }
   }
 
   return (
