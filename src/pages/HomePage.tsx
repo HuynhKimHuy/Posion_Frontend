@@ -1,10 +1,15 @@
-
+import { AppSidebar } from "@/components/sidebar/app-sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import ChatWindowLayout from "@/components/chat/ChatWindowLayout"
 const HomePage = () => {
- return (
-  <div className="flex items-center justify-center h-screen">
-    <h1 className="text-4xl font-bold">Welcome to the Home Page!</h1>
-  </div>
- )
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <div className="flex w-full p-2 ">
+        <ChatWindowLayout />
+      </div>
+    </SidebarProvider>
+  )
 }
 
 export default HomePage
