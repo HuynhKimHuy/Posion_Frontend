@@ -60,7 +60,7 @@ export const useAuthStore = create<authState>()(
 
           set({ accessToken });
           await get().fetchMe(accessToken);
-          useChatStore.getState().loadConversations();
+          await useChatStore.getState().loadConversations(accessToken);
           toast.success("wellcome back");
           return true;
         } catch (error) {

@@ -5,11 +5,9 @@ import {
   BookOpen,
   Bot,
   Frame,
-  LifeBuoy,
   Map,
   Moon,
   PieChart,
-  Send,
   Settings2,
   SquareTerminal,
   Sun,
@@ -131,18 +129,7 @@ const data = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
+
   projects: [
     {
       name: "Design Engineering",
@@ -179,7 +166,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Switch 
                     checked={isDarkMode}
                     onCheckedChange={toggleTheme} 
-                    clsassName="data-[state=checked]:bg-background/80"
+                    className="data-[state=checked]:bg-background/80"
                     />
                     <Moon className="size-4 text-white/80" />
                   </div>

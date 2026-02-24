@@ -1,7 +1,10 @@
 export interface Participant {
-  _id: string;
-  displayName: string;
+  userId: string;
+  userName?: string;
+  displayName?: string;
+  email?: string;
   avatarUrl?: string | null;
+  role?: "admin" | "member";
   joinedAt: string;
 }
 
@@ -30,12 +33,14 @@ export interface LastMessage {
 export interface Conversation {
   _id: string;
   type: "direct" | "group";
-  group: Group;
+  name?: string | null;
+  group?: Group | null;
   participants: Participant[];
-  lastMessageAt: string;
+  lastMessageAt?: string | null;
   seenBy: SeenUser[];
   lastMessage: LastMessage | null;
-  unreadCounts: Record<string, number>; // key = userId, value = unread count
+  unreadCounts?: Record<string, number>; // key = userId, value = unread count
+  createdBy?: string;
   createdAt: string;
   updatedAt: string;
 }

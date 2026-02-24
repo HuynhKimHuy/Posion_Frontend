@@ -1,9 +1,11 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useChatStore } from "@/stores/useChatStore";
 
 const ProtectedRoute = () => {
   const { user, accessToken, loading, refresh, fetchMe } = useAuthStore();
+  const loadConversations = useChatStore((state) => state.loadConversations);
   const location = useLocation();
   const [checking, setChecking] = useState(true);
 
@@ -12,6 +14,7 @@ const ProtectedRoute = () => {
       try {
         // Nếu đã có user từ store (vừa đăng nhập), không cần refresh lại
         if (user && accessToken) {
+          await loadConversations(accessToken);
           setChecking(false);
           return;
         }
@@ -22,6 +25,7 @@ const ProtectedRoute = () => {
         // Nếu refresh thành công, lấy user info
         if (newToken) {
           await fetchMe(newToken);
+          await loadConversations(newToken);
         }
       } catch (error) {
         console.log("Auth check error:", error);
@@ -31,7 +35,7 @@ const ProtectedRoute = () => {
     };
 
     checkAuth();
-  }, []); // Empty dependency array - chỉ chạy 1 lần khi mount
+  }, [accessToken, fetchMe, loadConversations, refresh, user]); // Empty dependency array - chỉ chạy 1 lần khi mount
 
   if (checking || loading) {
     return <div className="flex h-screen">Đang tải trang...</div>;

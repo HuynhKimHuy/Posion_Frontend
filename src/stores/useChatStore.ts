@@ -5,7 +5,7 @@ import { fetchConversations } from "@/service/chatSevice";
 
 export const useChatStore = create<chatState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             conversations: [],
             messages: {},
             activeConversationId: null,
@@ -22,10 +22,14 @@ export const useChatStore = create<chatState>()(
                     loading: false,
                 })
             },
-            loadConversations: async () => {
+            loadConversations: async (accessToken) => {
                 try {
                     set({ loading: true })
-                    const { conversations } = await fetchConversations();
+                    if (!accessToken) {
+                        set({ loading: false })
+                        return
+                    }
+                    const { conversations } = await fetchConversations(accessToken);
                     set({ conversations, loading: false })
                 } catch (error) {
                     console.log(error);
