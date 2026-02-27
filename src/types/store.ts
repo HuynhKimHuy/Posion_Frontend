@@ -13,7 +13,7 @@ export interface authState {
 
     logOut: () => Promise<void>
     fetchMe: (accessToken: string) => Promise<any>
-    refresh: () => Promise<string | null>
+    
 
 }
 
@@ -37,5 +37,5 @@ export interface chatState {
     resetChatState: () => void,
     setActiveConversation: (conversationId: string | null) => void,
     
-    loadConversations: (accessToken: string | null) => Promise<void>,
+    loadConversations: () => Promise<void>,
 }

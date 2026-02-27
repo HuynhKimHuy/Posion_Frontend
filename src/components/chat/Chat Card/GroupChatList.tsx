@@ -6,10 +6,10 @@ const GroupChatList = () => {
     const groupChatsList = conversations.filter((conv) => conv.type === "group")
 
     return (
-        <div className="">
-           {groupChatsList.map((convo)=>(
-            <GroupMessageCard key={convo._id} conversation={convo} />
-           ))}
+        <div className="py-2 px-1 space-y-2">
+            {groupChatsList.map((convo) => (
+                <GroupMessageCard key={convo._id} conversation={convo} />
+            ))}
         </div>
     )
 }

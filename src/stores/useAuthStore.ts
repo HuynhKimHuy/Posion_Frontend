@@ -5,16 +5,6 @@ import { authService } from "@/service/authService";
 import type { authState } from "@/types/store";
 import { useChatStore } from "./useChatStore";
 
-
-type ApiError = {
-  response?: {
-    status?: number;
-    data?: {
-      message?: string;
-    };
-  };
-};
-
 export const useAuthStore = create<authState>()(
   persist(
     (set, get) => ({
@@ -22,14 +12,14 @@ export const useAuthStore = create<authState>()(
       user: null,
       loading: false,
 
-      clearState: async () => {
+      clearState: () => {
         set({
           accessToken: null,
           user: null,
           loading: false,
         });
-        // Đảm bảo localStorage được clear
         localStorage.removeItem('auth-storage');
+        localStorage.removeItem('chat-storage');
         useChatStore.getState().resetChatState();
       },
 
@@ -37,10 +27,9 @@ export const useAuthStore = create<authState>()(
         try {
           set({ loading: true });
           await authService.signUp(userName, password, email, firstName, lastName);
-          toast.success("Đăng kí thành công! bạn sẽ được chuyển đến trang đăng nhập");
+          toast.success("Đăng ký thành công!");
         } catch (error) {
-          console.log(error);
-          toast.error(" Đăng kí không thành công ");
+          toast.error("Đăng ký thất bại");
         } finally {
           set({ loading: false });
         }
@@ -49,23 +38,18 @@ export const useAuthStore = create<authState>()(
       signIn: async (email, password) => {
         try {
           set({ loading: true });
-
-          localStorage.removeItem('auth-storage');
-          useChatStore.getState().resetChatState();
-
-
           const res = await authService.signIn(email, password);
           const accessToken = res?.metadata?.tokens?.accessToken;
-          if (!accessToken) throw new Error("Missing access token");
 
+          if (!accessToken) throw new Error("Missing access token");
           set({ accessToken });
           await get().fetchMe(accessToken);
-          await useChatStore.getState().loadConversations(accessToken);
-          toast.success("wellcome back");
+
+          toast.success("Đăng nhập thành công!");
+
           return true;
         } catch (error) {
-          console.log(error);
-          toast.error("login in error");
+          toast.error("Đăng nhập thất bại");
           return false;
         } finally {
           set({ loading: false });
@@ -74,51 +58,26 @@ export const useAuthStore = create<authState>()(
 
       logOut: async () => {
         try {
-          get().clearState();
           await authService.logOut();
           toast.success("Đã đăng xuất");
         } catch (error) {
-          console.log(error);
-          toast.error("Lỗi Khi Đăng Xuất");
+          toast.error("Lỗi khi đăng xuất");
+        } finally {
+          get().clearState();
+          window.location.href = "/signin";
         }
       },
 
       fetchMe: async (accessToken: string) => {
         try {
           set({ loading: true });
-          if (!accessToken) throw new Error("Missing access token");
           const user = await authService.fetchMe(accessToken);
           set({ user });
+          set({ loading: false });
           return user;
         } catch (error) {
-          console.log(error);
-          toast.error("Không lấy được thông tin user");
+          console.error("Fetch user error:", error);
           return null;
-        } finally {
-          set({ loading: false });
-        }
-      },
-
-      refresh: async () => {
-        try {
-          set({ loading: true });
-          const res = await authService.refresh();
-          set({ accessToken: res });
-          return res;
-        } catch (error) {
-          console.log(error);
-          const status = (error as ApiError)?.response?.status;
-          const message = (error as ApiError)?.response?.data?.message;
-          const isMissingRefreshToken = status === 400 && message === "Missing refresh token";
-
-          if (!isMissingRefreshToken) {
-            toast.error("Refresh token lỗi");
-          }
-
-          get().clearState();
-          return null;
-        } finally {
-          set({ loading: false });
         }
       },
     }),
@@ -126,6 +85,7 @@ export const useAuthStore = create<authState>()(
       name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
+        accessToken: state.accessToken,
       })
     }
   )

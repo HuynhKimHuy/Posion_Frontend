@@ -21,18 +21,18 @@ export const useChatStore = create<chatState>()(
                     activeConversationId: null,
                     loading: false,
                 })
+                // Clear localStorage
+                localStorage.removeItem('chat-storage');
             },
-            loadConversations: async (accessToken) => {
+            loadConversations: async () => {
                 try {
-                    set({ loading: true })
-                    if (!accessToken) {
-                        set({ loading: false })
-                        return
-                    }
-                    const { conversations } = await fetchConversations(accessToken);
+                    set({ loading: true, conversations: [] })
+                    console.log("📡 [useChatStore] Fetching conversations...")
+                    const { conversations } = await fetchConversations();
+                    console.log("✅ [useChatStore] Conversations loaded:", conversations)
                     set({ conversations, loading: false })
                 } catch (error) {
-                    console.log(error);
+                    console.error("❌ [useChatStore] Error loading conversations:", error);
                     set({ loading: false })
                 }
             }
@@ -42,6 +42,7 @@ export const useChatStore = create<chatState>()(
             name: "chat-storage",
             partialize: (state) => ({
                 conversations: state.conversations,
+                
             })
         }
     )

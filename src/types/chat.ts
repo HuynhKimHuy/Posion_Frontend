@@ -10,7 +10,8 @@ export interface Participant {
 
 export interface SeenUser {
   _id: string;
-  displayName?: string;
+  userName: string;
+  displayName: string;
   avatarUrl?: string | null;
 }
 
@@ -25,6 +26,7 @@ export interface LastMessage {
   createdAt: string;
   sender: {
     _id: string;
+    userName: string;
     displayName: string;
     avatarUrl?: string | null;
   };

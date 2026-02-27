@@ -13,14 +13,14 @@ function App() {
   useEffect(() => {
     setTheme(isDarkMode);
   }, [isDarkMode]);
-
+  
 
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/Signup" element={<SignUpPage />} />
-        <Route path="/Signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/signin" element={<SignInPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<HomePage />} />
         </Route>
