@@ -1,4 +1,3 @@
-import React from 'react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 interface userAvataProps {
@@ -10,7 +9,7 @@ interface userAvataProps {
 const UserAvatar = ({ type, name, imageUrl, className }: userAvataProps) => {
     const backgroundColors = !imageUrl ? "bg-blue-500" : ""
     if (!name) {
-        return (name = "Unknown User")
+        return <div>Unknown User</div>
     }
     return (
         <Avatar className={cn(className ?? "",

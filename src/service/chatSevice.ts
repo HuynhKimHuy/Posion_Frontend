@@ -9,7 +9,6 @@ const limit = 50
 export const fetchConversations = async (): Promise<ConversationResponse> => {
         const res = await api.get("/conversation");       
         return res.data.metadata;
-    
 }
 
 export const fetchMessages = async(fetchConversationsId:string, cursor?:string):Promise<fetchMessageProps> => {

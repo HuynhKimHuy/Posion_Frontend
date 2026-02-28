@@ -46,7 +46,6 @@ export const useAuthStore = create<authState>()(
           await get().fetchMe(accessToken);
 
           toast.success("Đăng nhập thành công!");
-
           return true;
         } catch (error) {
           toast.error("Đăng nhập thất bại");
@@ -73,28 +72,27 @@ export const useAuthStore = create<authState>()(
           set({ loading: true });
           const user = await authService.fetchMe(accessToken);
           set({ user });
-          set({ loading: false });
           return user;
         } catch (error) {
           console.error("Fetch user error:", error);
           return null;
+        } finally {
+          set({ loading: false });
         }
       },
 
       refresh:async()=>{
-       
-        const {user,fetchMe} = get();
-        if(!user){
-          await fetchMe(get().accessToken!);
-        }
         try{
           set({loading: true})
           const newAccessToken = await authService.refresh();
           set({ accessToken: newAccessToken });
           return newAccessToken;
+
         } catch(error) {
           console.error("Refresh token error:", error);
           return null;
+        } finally {
+          set({ loading: false });
         }
       }
     }),
@@ -102,7 +100,6 @@ export const useAuthStore = create<authState>()(
       name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
-        accessToken: state.accessToken,
       })
     }
   )

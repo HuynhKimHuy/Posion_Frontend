@@ -31,9 +31,12 @@ export const authService = {
     },
 
     fetchMe: async (accessToken: string) => {
-        const res = await api.get("/user/me", {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const res = await api.get("/user/me",  {
+            withCredentials: true,
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        })
         return res.data.metadata;
     },
     refresh: async () => {
