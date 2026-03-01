@@ -1,6 +1,6 @@
 import { useChatStore } from "@/stores/useChatStore"
 
-import DirectMessageCard from "./DirectMessageCard"
+import ConversationCard from "./ConversationCard"
 import { useEffect } from "react"
 
 const DirectMessageList = () => {
@@ -15,7 +15,7 @@ const DirectMessageList = () => {
     return (
         <div className="flex-1 overflow-y-auto px-1 space-y-2 py-2">
             {directMessages.map((conv) => (
-                <DirectMessageCard key={conv._id} conversation={conv} />
+                <ConversationCard key={conv._id} conversation={conv} />
             ))}
         </div>
     )

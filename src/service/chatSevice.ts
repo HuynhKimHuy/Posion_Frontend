@@ -12,7 +12,10 @@ export const fetchConversations = async (): Promise<ConversationResponse> => {
 }
 
 export const fetchMessages = async(fetchConversationsId:string, cursor?:string):Promise<fetchMessageProps> => {
-    const res = await api.get(`/conversation/${fetchConversationsId}/messages?limit=${limit}&cursor=${cursor}`);
+    const query = cursor
+        ? `limit=${limit}&cursor=${encodeURIComponent(cursor)}`
+        : `limit=${limit}`
+    const res = await api.get(`/conversation/${fetchConversationsId}/messages?${query}`);
      
     return {
         messages: res.data.metadata.messages,

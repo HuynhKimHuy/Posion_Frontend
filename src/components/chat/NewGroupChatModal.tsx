@@ -1,7 +1,7 @@
 const NewGroupChatModal = () => {
     return (
         <div className="">
-            add Group
+             Group
         </div>
       
     )

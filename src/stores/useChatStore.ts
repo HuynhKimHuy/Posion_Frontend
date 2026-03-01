@@ -65,12 +65,13 @@ export const useChatStore = create<chatState>()(
                 if (!converId) return
 
                 const currentMessages = messages?.[converId]
-                const nextCurrsor = currentMessages?.nextCursor === undefined ? null : currentMessages?.nextCursor
-                if (nextCurrsor === null) return
+                const nextCurrsor = currentMessages?.nextCursor
+                const isFirstLoad = !currentMessages
+                if (!isFirstLoad && nextCurrsor === null) return
                 set({ messagesLoading: true })
                 try {
 
-                    const { messages: fetched, cursor } = await fetchMessages(converId, nextCurrsor)
+                    const { messages: fetched, cursor } = await fetchMessages(converId, nextCurrsor ?? undefined)
 
                     /**{
                       messages: [
@@ -107,7 +108,8 @@ export const useChatStore = create<chatState>()(
                })
                 } catch (error) {
                     console.log("lỗi xảy ra khi fetchMessages" , error);
-                    
+                } finally {
+                    set({ messagesLoading: false })
                 }
 
             }
