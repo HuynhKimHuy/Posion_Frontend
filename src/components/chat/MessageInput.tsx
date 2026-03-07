@@ -3,6 +3,7 @@ import { ImagePlay, Send } from "lucide-react"
 import { useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import EmojiPicker from "./Chat Card/EmojiPicker"
 
 const MessageInput = () => {
 const {user } = useAuthStore()
@@ -30,7 +31,7 @@ const [value , setValue] = useState("")
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
                 <Button variant="ghost" size="icon" className="h-6 w-6 p-0 rounded-full hover:bg-primary-forground/10">
                     {/* icon Emoji */}
-
+                    <EmojiPicker onChange={(emoji) => setValue((prev) => prev + emoji)} />
                 </Button>
             </div>
             
