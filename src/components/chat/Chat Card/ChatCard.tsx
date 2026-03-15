@@ -15,8 +15,8 @@ interface ChatCardProps {
 const ChatCard = ({ conversationId, name, timestamp, isActive, onSelectConversation, unreadCount, leftSection, subTitle }: ChatCardProps) => {
     return (
         <Card key={conversationId}
-            className={cn("border-none p-3 cursor-pointer transition-smooth glass hover:bg-muted/30",
-                isActive && "ring-2 ring-primary/50 bg-gradient-to-tr from-primary-glow/10 to-primary-foreground"
+            className={cn("group cursor-pointer border border-transparent px-3.5 py-3 transition-smooth glass hover:border-primary/15 hover:bg-muted/40",
+                isActive && "border-primary/25 bg-muted/55"
             )}
             onClick={() => onSelectConversation(conversationId)}
         >
@@ -26,18 +26,18 @@ const ChatCard = ({ conversationId, name, timestamp, isActive, onSelectConversat
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="mb-1.5 flex items-center justify-between">
 
-                        <h3 className={cn("font-semibold truncate", unreadCount && unreadCount > 0 && "text-foreground")}>{name}</h3>
-                        <span className="text-xs text-muted-foreground">
+                        <h3 className={cn("truncate text-sm font-semibold leading-tight", unreadCount && unreadCount > 0 && "text-foreground")}>{name}</h3>
+                        <span className="text-[11px] text-muted-foreground">
                             {timestamp ? formatMessageTime(new Date(timestamp)) : ""}
                         </span>
                     </div>
 
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="mb-0.5 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1 flex-1 min-w-0">{subTitle}</div>
 
-                        <MoreHorizontal className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 hover:size-5 transition-smooth">
+                        <MoreHorizontal className="size-4 text-muted-foreground opacity-0 transition-smooth group-hover:opacity-100">
                         </MoreHorizontal>
                     </div>
                 </div>

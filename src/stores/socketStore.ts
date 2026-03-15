@@ -89,12 +89,18 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
             if (userId && activeConversationId === payload.conversation._id) {
                 mergedUnreadCounts[userId] = 0
+                void useChatStore.getState().markConversationAsRead(payload.conversation._id)
             }
 
             useChatStore.getState().updateConversation({
                 ...payload.conversation,
                 unreadCounts: mergedUnreadCounts,
             })
+        })
+
+        socket.on("conversation-read", (payload: { conversation?: any }) => {
+            if (!payload?.conversation?._id) return
+            useChatStore.getState().updateConversation(payload.conversation)
         })
 
         socket.on("disconnect", (reason) => {

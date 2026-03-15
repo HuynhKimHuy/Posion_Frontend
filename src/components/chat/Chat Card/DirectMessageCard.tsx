@@ -43,7 +43,7 @@ const DirectMessageCard = ({ conversation }: { conversation: Conversation }) => 
                 <div className="relative">
                     <UserAvatar type="sidebar" name={otherUser?.displayName || otherUser?.userName || ""} />
                     <StatusBadge status={onlineUsers.includes(otherUser?.userId || "") ? "online" : "offline"} />
-                    {unreadCount > 0 && <UnreadCountBadge UnreadCount={unreadCount} />}
+                    {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
                 </div>
             }
             onSelectConversation={handleSelectConversation}

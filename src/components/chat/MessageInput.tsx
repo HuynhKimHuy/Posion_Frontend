@@ -35,8 +35,8 @@ const [value , setValue] = useState("")
     }
     
     return (
-        <div className="flex w-full items-center gap-2 p-3 min-h-[50px] bg-background rounded-md">   
-           <Button variant="ghost" size="icon" className="h-8 w-8 p-0 rounded-full hover:bg-primary-forground/10">
+        <div className="glass flex min-h-14 w-full items-center gap-2 rounded-2xl p-2.5">
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full p-0 hover:bg-primary/10">
             <ImagePlay className="size-4"/>
            </Button>
 
@@ -50,8 +50,8 @@ const [value , setValue] = useState("")
                     }
                 }}
                 type="text" 
-                placeholder="Nhập Tin Nhắn ...." 
-                className=" w-full bg-transparent border-none focus:outline-none transition-smooth pr-10 resize-none "
+                placeholder="Nhập tin nhắn..." 
+                className="h-10 w-full rounded-full border border-border/80 bg-muted/50 pr-10 pl-4 text-sm text-foreground transition-smooth placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/15"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 />
@@ -62,7 +62,7 @@ const [value , setValue] = useState("")
            </div>
            <Button 
             onClick={sendMessage}
-            className="bg-gradient-chat hover:shadow-glow transition-smooth transform  rounded-full" disabled={!value.trim()}>
+            className="rounded-full bg-primary text-primary-foreground transition-smooth hover:bg-primary/90" disabled={!value.trim()}>
                 <Send className="size-4 text-white"/>
             </Button>
         </div>

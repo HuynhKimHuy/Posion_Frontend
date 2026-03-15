@@ -12,9 +12,9 @@ const ChatWellcome = ({ hasSelectedConversation = false }: ChatWellcomeProps) =>
 		: "Chọn một cuộc trò chuyện ở sidebar để bắt đầu nhắn tin với bạn bè.";
 
 	return (
-		<div className="flex h-full w-full items-center justify-center rounded-lg border border-border bg-background p-6">
+		<div className="flex h-full w-full items-center justify-center rounded-2xl border border-border/70 bg-[linear-gradient(165deg,rgba(255,255,255,0.82),rgba(245,248,255,0.95))] dark:border-border/50 dark:bg-[linear-gradient(165deg,rgba(12,14,16,0.6),rgba(6,8,10,0.85))] p-6">
 			<div className="mx-auto flex max-w-md flex-col items-center text-center">
-				<div className="mb-6 w-full max-w-xs text-muted-foreground">
+				<div className="mb-6 w-full max-w-xs text-muted-foreground dark:text-muted-foreground/80">
 					<svg viewBox="0 0 320 220" fill="none" className="h-auto w-full">
 						<rect x="24" y="38" width="164" height="104" rx="16" className="fill-muted" />
 						<rect x="42" y="62" width="90" height="10" rx="5" className="fill-background" />
@@ -31,8 +31,8 @@ const ChatWellcome = ({ hasSelectedConversation = false }: ChatWellcomeProps) =>
 					</svg>
 				</div>
 
-				<h2 className="text-xl font-semibold text-foreground">{title}</h2>
-				<p className="mt-2 text-sm text-muted-foreground">{description}</p>
+				<h2 className="text-xl font-semibold text-foreground dark:text-white">{title}</h2>
+				<p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground/80">{description}</p>
 			</div>
 		</div>
 	);

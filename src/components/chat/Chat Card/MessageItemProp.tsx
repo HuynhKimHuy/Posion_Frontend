@@ -8,13 +8,31 @@ interface MessageItemProps {
     index: number
     messages: Message[]
     selectedConvo: Conversation
-    lastMessageStatus: "seen" | "delivered" | "sent"
+    lastMessageStatus: "seen" | "read" | "delivered"
+    lastOwnMessageId?: string
 
 }
 
-const MessageItem = ({ message, index, messages, selectedConvo, lastMessageStatus }: MessageItemProps) => {
+const MessageItem = ({ message, index, messages, selectedConvo, lastMessageStatus, lastOwnMessageId,  }: MessageItemProps) => {
     const prev = messages[index - 1]
     const isGroupBreak = index === 0 || !prev || prev.senderId !== message.senderId || new Date(message.createdAt).getTime() - new Date(prev.createdAt).getTime() > 5 * 60 * 1000
+    const seenByOthers = (selectedConvo.seenBy || []).filter((user) => user._id !== message.senderId)
+    const seenNames = seenByOthers.map((user) => user.displayName || user.userName).filter(Boolean)
+
+    const getStatusText = () => {
+        if (lastMessageStatus === "seen") {
+            if (selectedConvo.type === "group" && seenNames.length > 0) {
+                return `Đã xem bởi ${seenNames.join(", ")}`
+            }
+            return "Đã xem"
+        }
+
+        if (lastMessageStatus === "read") {
+            return "Đã đọc"
+        }
+
+        return "Đã nhận"
+    }
 
     const participant = selectedConvo.participants.find(p => p.userId === message.senderId)
     return (
@@ -42,7 +60,7 @@ const MessageItem = ({ message, index, messages, selectedConvo, lastMessageStatu
             message.isOwn ? "items-end" : "items-start",
         )}>
             <Card className={cn("p-2", message.isOwn ? "chat-bubble-sent" : "chat-bubble-received")}> 
-                <p className="text-sm loading-relaxed break-words">{message.content}</p>
+                <p className="text-sm loading-relaxed wrap-break-word">{message.content}</p>
             </Card>
 
             {/**  status */}
@@ -52,9 +70,9 @@ const MessageItem = ({ message, index, messages, selectedConvo, lastMessageStatu
             </span>)}
 
             {/**  send delivered  */}
-            {message.isOwn && message._id === selectedConvo.lastMessage?._id && (
+            {message.isOwn && message._id === lastOwnMessageId && (
                 <span className="text-xs text-muted-foreground px-1">
-                    {lastMessageStatus === "seen" ? "Đã xem" : lastMessageStatus === "delivered" ? "Đã gửi" : "Đang gửi..."}
+                    {getStatusText()}
                 </span>
             )}
 

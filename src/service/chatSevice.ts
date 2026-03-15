@@ -32,3 +32,8 @@ export const sendGroupMessage = async( conversationId: string, content: string ,
     const res = await api.post(`/message/group`, { content, imageUrl, conversationId });
     return res.data.metadata;
 }
+
+export const markConversationAsRead = async (conversationId: string) => {
+    const res = await api.post(`/conversation/${conversationId}/read`)
+    return res.data.metadata
+}

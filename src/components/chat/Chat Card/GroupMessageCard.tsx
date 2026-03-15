@@ -43,7 +43,7 @@ const GroupMessageCard = ({ conversation }: { conversation: Conversation }) => {
                 <div className="flex items-center gap-3 relative">
                     <UserAvatar type="sidebar" name={name} />
                     <StatusBadge status="offline" />
-                    {unreadCount > 0 && <UnreadCountBadge UnreadCount={unreadCount} />}
+                    {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
                 </div>
             }
             subTitle={

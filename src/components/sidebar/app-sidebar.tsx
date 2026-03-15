@@ -42,16 +42,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className=" bg-blue-600 ">
+            <SidebarMenuButton size="lg" asChild className="bg-sidebar-primary rounded-xl shadow-sm border border-white/10">
               <a href="#">
-                <div className="w-full flex justify-between items-center ">
-                  <h1 className="text-2xl font-bold">Posion</h1>
+                <div className="w-full flex justify-between items-center">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-white">Posion</h1>
                   <div className="flex item-center gap-2">
                     <Sun className="size-4 text-white/80" />
                     <Switch
                       checked={isDarkMode}
                       onCheckedChange={toggleTheme}
-                      className="data-[state=checked]:bg-background/80"
+                      className="data-[state=checked]:bg-white/90 data-[state=unchecked]:bg-white/40"
                     />
                     <Moon className="size-4 text-white/80" />
                   </div>

@@ -64,7 +64,7 @@ const ConversationCard = ({ conversation }: ConversationCardProps) => {
                     ) : (
                         <GroupchatAvatar participants={conversation.participants} type="sidebar" />
                     )}
-                    {unreadCount > 0 && <UnreadCountBadge UnreadCount={unreadCount} />}
+                    {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
                 </div>
             }
             subTitle={

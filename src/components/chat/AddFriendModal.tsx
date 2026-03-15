@@ -3,7 +3,7 @@
 const AddFriendModal = () => {
     return (
         <div className="">
-            Add Friend  
+             Friend  
         </div>
     )
 }
