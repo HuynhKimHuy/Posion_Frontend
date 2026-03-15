@@ -122,6 +122,9 @@
     font-family: Manrope, "SF Pro Text", "Segoe UI", sans-serif;
     background-image: none;
   }
+  .Success-message{
+    @apply text-sm text-emerald-500
+  }
 }
 
 @layer utilities {
