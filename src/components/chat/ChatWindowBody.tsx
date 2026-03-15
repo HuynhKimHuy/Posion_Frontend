@@ -1,7 +1,7 @@
 import { useChatStore } from "@/stores/useChatStore"
 import { useAuthStore } from "@/stores/useAuthStore"
 import MessageItem from "./Chat Card/MessageItemProp"
-import { useEffect, useLayoutEffect, useRef } from "react"
+import { useLayoutEffect, useRef } from "react"
 
 
 const ChatWindowBody = () => {
