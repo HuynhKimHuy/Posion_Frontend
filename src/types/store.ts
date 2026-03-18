@@ -45,4 +45,9 @@ export interface chatState {
     addMessage:(Message:Message)=>Promise<any>
     updateConversation:(conversation:Conversation)=> void
 }
+export interface friendState {
+    loading: boolean,
+    searchByUserName: (query: string) => Promise<User|null>,
+    sendFriendRequest: (to: string, message?: string) => Promise<string>
 
+}
