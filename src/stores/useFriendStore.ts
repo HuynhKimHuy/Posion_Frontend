@@ -3,8 +3,11 @@ import type { friendState } from "@/types/store";
 import { create } from "zustand";
 
 
-export const useFriendStore = create<friendState>((set,get) => ({
+export const useFriendStore = create<friendState>((set, get) => ({
     loading: false,
+    receivedRequests: [],
+    sentRequests: [],
+
     searchByUserName:async(username)=>{
         try {
             set({loading:true})
@@ -19,7 +22,7 @@ export const useFriendStore = create<friendState>((set,get) => ({
             set({loading:false})
         }
     },
-    sendFriendRequest:async(to, message?)=>{
+    sendFriendRequest:async(to, message)=>{
         try{
             set({loading:true})
             const resultMessageRequest = await friendService.sendFriendRequest(to, message)
@@ -32,5 +35,43 @@ export const useFriendStore = create<friendState>((set,get) => ({
             set({loading:false})
         }
 
+    },
+    getAllFriendsRequest: async () => {
+        try {
+            set({ loading: true });
+            const requests = await friendService.getAllFriendsRequest();
+            set({ receivedRequests: requests.received, sentRequests: requests.sent });
+        } catch (error) {
+            console.error("Error fetching friend requests:", error);
+        } finally {
+            set({ loading: false });
+        }
+    },
+    acceptFriendRequest: async (requestId: string) => {
+        try {
+            set({ loading: true });
+            const newFriend = await friendService.acceptFriendRequest(requestId);
+            // Refresh received requests to remove accepted request
+            await get().getAllFriendsRequest();
+            return newFriend;
+        } catch (error) {
+            console.error("Error accepting friend request:", error);
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+    declineFriendRequest: async (requestId: string) => {
+        try {
+            set({ loading: true });
+            const result = await friendService.declineFriendRequest(requestId);
+            await get().getAllFriendsRequest();
+            return result;
+        } catch (error) {
+            console.error("Error declining friend request:", error);
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
     }
 }))

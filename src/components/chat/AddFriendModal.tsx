@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import {Dialog, DialogTrigger , DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 import type { User } from "@/types/user";
 import { useFriendStore } from "@/stores/useFriendStore";
 import SearchForm from "./AddFriendModal/SearchFormModal";
@@ -11,14 +12,15 @@ import SendFriendRequest from "./AddFriendModal/SendFriendRequest";
 
 export interface AddFriendModalProps {
     username: string;
-    message?: string;
+    message: string;
 }
 
 const AddFriendModal = () => {
     const [isFound, setIsFound] = useState<boolean | null>(null);
     const [searchUser,setSearchUser] = useState<User | null>(null);
     const [searchUserName, setSearchUserName] = useState<string>("");
-    const { loading , searchByUserName , sendFriendRequest } = useFriendStore();
+    const [alreadySent, setAlreadySent] = useState<boolean>(false);
+    const { loading , searchByUserName , sendFriendRequest, getAllFriendsRequest } = useFriendStore();
     const {
         register,
         handleSubmit,
@@ -46,34 +48,72 @@ const AddFriendModal = () => {
         try{
             const user = await searchByUserName(userName);
             if(user){
+                await getAllFriendsRequest();
+                const sentRequests = useFriendStore.getState().sentRequests;
+                const isAlreadySent = sentRequests.some((request) =>
+                    request.userId
+                        ? request.userId === user._id
+                        : request.username.toLowerCase() === user.userName.toLowerCase()
+                );
+
+                setAlreadySent(isAlreadySent);
                 setIsFound(true);
                 setSearchUser(user);
                 setSearchUserName(userName);
             } else {
                 setIsFound(false);
+                setSearchUser(null);
+                setAlreadySent(false);
             }
         } catch(error) {
             console.error("Error searching for user:", error);
             setIsFound(false);
+            setSearchUser(null);
+            setAlreadySent(false);
         }
      }
     );
     
     const handleSendRequest = handleSubmit(async (data) => {
-        if(!searchUser) return;
+        if(!searchUser?._id) {
+            toast.error("User not found. Please search again.");
+            return;
+        }
+        const message = data.message.trim();
+        if (!message) {
+            toast.error("Please enter a friend request message.");
+            return;
+        }
+        if (alreadySent) {
+            toast.info("You already sent a friend request to this user.");
+            return;
+        }
         try {
-             const message = await sendFriendRequest(searchUser._id, data.message);
-             toast.success(message);
+             const responseMessage = await sendFriendRequest(searchUser._id, message);
+             setAlreadySent(true);
+             toast.success(responseMessage);
             handleReset();
         } catch(error) {
             console.error("Error sending friend request:", error);
-            toast.error("Failed to send friend request.");
+            if (axios.isAxiosError(error)) {
+                const serverMessage = error.response?.data?.message;
+                toast.error(serverMessage || "Failed to send friend request.");
+            } else {
+                toast.error("Failed to send friend request.");
+            }
         }
     });
 
     const handleReset = () => {
         reset();
         setIsFound(null);
+        setSearchUser(null);
+        setSearchUserName("");
+        setAlreadySent(false);
+    }
+
+    const handleBackToSearch = () => {
+        setIsFound(false);
     }
 
     return (
@@ -103,8 +143,14 @@ const AddFriendModal = () => {
                     </>}
                 {isFound && <>
                     <SendFriendRequest
+                        loading={loading}
                         register={register}
-                        searchUserName={searchUserName}
+                        errors={errors}
+                        watch={watch}
+                        foundUser={searchUser}
+                        alreadySent={alreadySent}
+                        onSubmit={handleSendRequest}
+                        onBack={handleBackToSearch}
                     />
 
                 </>}

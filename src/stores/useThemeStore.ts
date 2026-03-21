@@ -31,7 +31,6 @@ persist(
     }
     ),{
         name: "theme-storage",
-
     }
 )
 )
