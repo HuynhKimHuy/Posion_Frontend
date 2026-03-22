@@ -1,38 +1,40 @@
 import { friendService } from "@/service/friendSevervice";
 import type { friendState } from "@/types/store";
+import type { Friend } from "@/types/user";
 import { create } from "zustand";
 
 
 export const useFriendStore = create<friendState>((set, get) => ({
+    friends: [],
     loading: false,
     receivedRequests: [],
     sentRequests: [],
 
-    searchByUserName:async(username)=>{
+    searchByUserName: async (username) => {
         try {
-            set({loading:true})
+            set({ loading: true })
             const user = await friendService.SearchByUserName(username)
-            return user 
+            return user
         } catch (error) {
-            set({loading:false})
+            set({ loading: false })
             console.error("Error searching user:", error);
             return null
-            
-        } finally{
-            set({loading:false})
+
+        } finally {
+            set({ loading: false })
         }
     },
-    sendFriendRequest:async(to, message)=>{
-        try{
-            set({loading:true})
+    sendFriendRequest: async (to, message) => {
+        try {
+            set({ loading: true })
             const resultMessageRequest = await friendService.sendFriendRequest(to, message)
             return resultMessageRequest
-        }catch(error){
-            set({loading:false})
+        } catch (error) {
+            set({ loading: false })
             console.error("Error sending friend request:", error);
             throw error
-        } finally{
-            set({loading:false})
+        } finally {
+            set({ loading: false })
         }
 
     },
@@ -73,5 +75,22 @@ export const useFriendStore = create<friendState>((set, get) => ({
         } finally {
             set({ loading: false });
         }
-    }
+    },
+    getFriendList: async () => {
+        try {
+            set({ loading: true })
+            const friendsList = await friendService.getFriendsList()
+            const normalizedFriends: Friend[] = friendsList.map((friend) => ({
+                _id: friend._id,
+                username: friend.userName,
+                displayName: friend.userName,
+                avatarUrl: friend.avatarUrl,
+            }));
+            set({ friends: normalizedFriends })
+        } catch (error) {
+            console.error("Error fetching friend list:", error);
+        } finally {
+            set({ loading: false })
+        }
+    },
 }))

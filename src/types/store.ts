@@ -1,5 +1,5 @@
 import type { Conversation, Message } from "./chat"
-import type { FriendRequest, User } from "./user"
+import type { Friend, FriendRequest, User } from "./user"
 
 export interface authState {
     accessToken: string | null,
@@ -47,6 +47,7 @@ export interface chatState {
 }
 export interface friendState {
     loading: boolean,
+    friends: Friend[],
     receivedRequests: FriendRequest[],
     sentRequests: FriendRequest[],
     searchByUserName: (query: string) => Promise<User|null>,
@@ -54,5 +55,6 @@ export interface friendState {
     getAllFriendsRequest: () => Promise<void>
     acceptFriendRequest: (requestId: string) => Promise<User>
     declineFriendRequest: (requestId: string) => Promise<string>
+    getFriendList: () => Promise<void>
 
 }

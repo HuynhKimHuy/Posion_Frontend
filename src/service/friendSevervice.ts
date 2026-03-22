@@ -17,6 +17,14 @@ type ApiFriendRequest = {
     message?: string;
 };
 
+type FriendListItem = Pick<User, "_id" | "userName" | "avatarUrl">;
+
+const mapToFriendListItem = (user: ApiRequestUser): FriendListItem => ({
+    _id: user._id ?? "",
+    userName: user.userName ?? "",
+    avatarUrl: user.avatarUrl,
+});
+
 const mapToFriendRequest = (request: ApiFriendRequest, user?: ApiRequestUser): FriendRequest => {
     const firstName = user?.firstName?.trim() ?? "";
     const lastName = user?.lastName?.trim() ?? "";
@@ -81,6 +89,12 @@ export const friendService = {
     async declineFriendRequest(requestId: string): Promise<string> {
         const res = await api.post(`/friends/requests/${requestId}/decline`);
         return res.data.message;
-    }
+    },
+    async getFriendsList(): Promise<FriendListItem[]> {
+        const res = await api.get("/friends");
+        return Array.isArray(res.data?.metadata)
+            ? (res.data.metadata as ApiRequestUser[]).map(mapToFriendListItem)
+            : [];
+    },
 
 };

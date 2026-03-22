@@ -10,7 +10,7 @@ const HomePage = () => {
       <div className="flex h-full min-h-0 w-full overflow-hidden p-2">
         <ChatWindowLayout />
       </div>
-    </SidebarProvider>
+    </SidebarProvider>                                    
   )
 }
 
