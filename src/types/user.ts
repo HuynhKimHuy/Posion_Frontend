@@ -5,6 +5,8 @@ export interface User {
     firstName: string;
     lastName: string;
     avatarUrl?: string;
+    coverUrl?: string;
+    bio?: string;
     roles: string;
     createdAt?: string;
     updatedAt?: string;

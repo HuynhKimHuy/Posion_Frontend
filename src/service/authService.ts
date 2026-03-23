@@ -1,5 +1,12 @@
 import api from "@/lib/axios"
 
+const withAuthConfig = (accessToken: string) => ({
+    withCredentials: true,
+    headers: {
+        Authorization: `Bearer ${accessToken}`,
+    },
+})
+
 export const authService = {
     signUp: async (
         userName: string,
@@ -31,12 +38,7 @@ export const authService = {
     },
 
     fetchMe: async (accessToken: string) => {
-        const res = await api.get("/user/me",  {
-            withCredentials: true,
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        })
+        const res = await api.get("/user/me", withAuthConfig(accessToken))
         return res.data.metadata;
     },
     refresh: async () => {

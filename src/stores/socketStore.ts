@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { io, type Socket } from 'socket.io-client'
 import { useAuthStore } from './useAuthStore'
 import { useChatStore } from './useChatStore'
+import { useFriendStore } from './useFriendStore'
 
 
 interface SocketState {
@@ -101,6 +102,14 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         socket.on("conversation-read", (payload: { conversation?: any }) => {
             if (!payload?.conversation?._id) return
             useChatStore.getState().updateConversation(payload.conversation)
+        })
+
+        socket.on("friend-request:new", () => {
+            void useFriendStore.getState().getAllFriendsRequest()
+        })
+
+        socket.on("friend-request:changed", () => {
+            void useFriendStore.getState().getAllFriendsRequest()
         })
 
         socket.on("disconnect", (reason) => {

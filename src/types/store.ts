@@ -14,6 +14,8 @@ export interface authState {
     logOut: () => Promise<void>
     fetchMe: (accessToken: string) => Promise<any>
     refresh: () => Promise<string|null>
+    updateProfile: (bio: string) => Promise<User | null>
+    updateCoverImage: (file: File) => Promise<User | null>
 
 }
 
@@ -44,6 +46,8 @@ export interface chatState {
     sendGroupMessage: (conversationId: string, content: string, imageUrl?: string) => Promise<void>
     addMessage:(Message:Message)=>Promise<any>
     updateConversation:(conversation:Conversation)=> void
+    addConversation:(conversation:Conversation) => void
+    createConversation: (type: "direct" | "group", name: string, recipientIds: string[]) => Promise<Conversation>
 }
 export interface friendState {
     loading: boolean,
@@ -56,5 +60,6 @@ export interface friendState {
     acceptFriendRequest: (requestId: string) => Promise<User>
     declineFriendRequest: (requestId: string) => Promise<string>
     getFriendList: () => Promise<void>
+    
 
 }

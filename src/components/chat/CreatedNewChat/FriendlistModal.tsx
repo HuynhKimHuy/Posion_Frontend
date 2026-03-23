@@ -1,11 +1,53 @@
 import { useFriendStore } from "@/stores/useFriendStore"
-import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { MessageCircleMore } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import UserAvatar from "@/components/chat/UserAvata"
+import { useChatStore } from "@/stores/useChatStore"
+import { useState } from "react"
 
 const FriendlistModal = () => {
     const { friends } = useFriendStore()
+    const [pendingFriendId, setPendingFriendId] = useState<string | null>(null)
+    const {
+        conversations,
+        activeConversationId,
+        setActiveConversation,
+        createConversation,
+        fetchMessages,
+        messages,
+    } = useChatStore()
+
+    const handleStartDirectChat = async (friendId: string) => {
+        try {
+            setPendingFriendId(friendId)
+
+            let targetConversation = conversations.find(
+                (conversation) =>
+                    conversation.type === "direct" &&
+                    conversation.participants.some((participant) => String(participant.userId) === String(friendId))
+            )
+
+            if (!targetConversation) {
+                targetConversation = await createConversation("direct", "", [friendId])
+            }
+
+            if (!targetConversation?._id) return
+
+            if (activeConversationId !== targetConversation._id) {
+                setActiveConversation(targetConversation._id)
+            }
+
+            if (!messages[targetConversation._id]) {
+                await fetchMessages(targetConversation._id)
+            }
+        } catch (error) {
+            console.error("Failed to start direct chat", error)
+        } finally {
+            setPendingFriendId(null)
+        }
+    }
+
     return (
         <DialogContent className="glass max-w-md">
             <DialogHeader>
@@ -28,20 +70,31 @@ const FriendlistModal = () => {
                     </h1>
                     <div>
                         {friends.map((friend) => (
-                            <Card key={friend._id} className="group/friendCard cursor-pointer p-3 transition-colors hover:bg-muted/50">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative">
-                                        <UserAvatar
-                                            type="sidebar"
-                                            name={friend.displayName || friend.username}
-                                            imageUrl={friend.avatarUrl}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-medium">{friend.displayName || friend.username}</span>
-                                    </div>
-                                </div>
-                            </Card>
+                            <DialogClose key={friend._id} asChild>
+                                <button
+                                    type="button"
+                                    className="w-full text-left"
+                                    disabled={pendingFriendId === friend._id}
+                                    onClick={() => void handleStartDirectChat(friend._id)}
+                                >
+                                    <Card className="group/friendCard cursor-pointer p-3 transition-colors hover:bg-muted/50">
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative">
+                                                <UserAvatar
+                                                    type="sidebar"
+                                                    name={friend.displayName || friend.username}
+                                                    imageUrl={friend.avatarUrl}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium">
+                                                    {pendingFriendId === friend._id ? "Dang mo cuoc tro chuyen..." : friend.displayName || friend.username}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </button>
+                            </DialogClose>
                         ))}
                     </div>
                 </div>

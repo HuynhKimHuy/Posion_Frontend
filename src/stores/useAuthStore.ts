@@ -2,28 +2,38 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { toast } from "sonner";
 import { authService } from "@/service/authService";
+import { profileService } from "@/service/profileService";
 import type { authState } from "@/types/store";
 import { useChatStore } from "./useChatStore";
 
 export const useAuthStore = create<authState>()(
   persist(
-    (set, get) => ({
-      accessToken: null,
-      user: null,
-      loading: false,
+    (set, get) => {
+      const requireAccessToken = () => {
+        const token = get().accessToken;
+        if (!token) {
+          throw new Error("Missing access token");
+        }
+        return token;
+      };
 
-      clearState: () => {
-        set({
-          accessToken: null,
-          user: null,
-          loading: false,
-        });
-        localStorage.removeItem('auth-storage');
-        localStorage.removeItem('chat-storage');
-        useChatStore.getState().resetChatState();
-      },
+      return {
+        accessToken: null,
+        user: null,
+        loading: false,
 
-      signUp: async (userName, password, email, firstName, lastName) => {
+        clearState: () => {
+          set({
+            accessToken: null,
+            user: null,
+            loading: false,
+          });
+          localStorage.removeItem('auth-storage');
+          localStorage.removeItem('chat-storage');
+          useChatStore.getState().resetChatState();
+        },
+
+        signUp: async (userName, password, email, firstName, lastName) => {
         try {
           set({ loading: true });
           await authService.signUp(userName, password, email, firstName, lastName);
@@ -33,9 +43,9 @@ export const useAuthStore = create<authState>()(
         } finally {
           set({ loading: false });
         }
-      },
+        },
 
-      signIn: async (email, password) => {
+        signIn: async (email, password) => {
         try {
           set({ loading: true });
           const res = await authService.signIn(email, password);
@@ -53,9 +63,9 @@ export const useAuthStore = create<authState>()(
         } finally {
           set({ loading: false });
         }
-      },
+        },
 
-      logOut: async () => {
+        logOut: async () => {
         try {
           await authService.logOut();
           toast.success("Đã đăng xuất");
@@ -65,9 +75,9 @@ export const useAuthStore = create<authState>()(
           get().clearState();
           window.location.href = "/signin";
         }
-      },
+        },
 
-      fetchMe: async (accessToken: string) => {
+        fetchMe: async (accessToken: string) => {
         try {
           set({ loading: true });
           const user = await authService.fetchMe(accessToken);
@@ -79,23 +89,60 @@ export const useAuthStore = create<authState>()(
         } finally {
           set({ loading: false });
         }
-      },
+        },
 
-      refresh:async()=>{
-        try{
-          set({loading: true})
+        refresh: async () => {
+          try {
+            set({ loading: true })
           const newAccessToken = await authService.refresh();
           set({ accessToken: newAccessToken });
           return newAccessToken;
 
-        } catch(error) {
-          console.error("Refresh token error:", error);
+          } catch (error) {
+            console.error("Refresh token error:", error);
+            return null;
+          } finally {
+            set({ loading: false });
+          }
+        },
+
+        updateProfile: async (bio: string) => {
+        try {
+          set({ loading: true });
+          const token = requireAccessToken();
+
+          const updatedUser = await profileService.updateProfile(token, bio);
+          set({ user: updatedUser });
+          toast.success("Cập nhật hồ sơ thành công");
+          return updatedUser;
+        } catch (error) {
+          console.error("Update profile error:", error);
+          toast.error("Cập nhật hồ sơ thất bại");
           return null;
         } finally {
           set({ loading: false });
         }
-      }
-    }),
+        },
+
+        updateCoverImage: async (file: File) => {
+        try {
+          set({ loading: true });
+          const token = requireAccessToken();
+
+          const updatedUser = await profileService.updateCoverImage(token, file);
+          set({ user: updatedUser });
+          toast.success("Cập nhật ảnh bìa thành công");
+          return updatedUser;
+        } catch (error) {
+          console.error("Update cover image error:", error);
+          toast.error("Không thể cập nhật ảnh bìa. Hãy chỉnh API sau.");
+          return null;
+        } finally {
+          set({ loading: false });
+        }
+        }
+      };
+    },
     {
       name: "auth-storage",
       partialize: (state) => ({

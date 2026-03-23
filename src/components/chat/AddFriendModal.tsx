@@ -18,9 +18,9 @@ export interface AddFriendModalProps {
 const AddFriendModal = () => {
     const [isFound, setIsFound] = useState<boolean | null>(null);
     const [searchUser,setSearchUser] = useState<User | null>(null);
-    const [searchUserName, setSearchUserName] = useState<string>("");
     const [alreadySent, setAlreadySent] = useState<boolean>(false);
-    const { loading , searchByUserName , sendFriendRequest, getAllFriendsRequest } = useFriendStore();
+    const [alreadyFriend, setAlreadyFriend] = useState<boolean>(false);
+    const { loading , searchByUserName , sendFriendRequest, getAllFriendsRequest, getFriendList } = useFriendStore();
     const {
         register,
         handleSubmit,
@@ -48,28 +48,34 @@ const AddFriendModal = () => {
         try{
             const user = await searchByUserName(userName);
             if(user){
-                await getAllFriendsRequest();
-                const sentRequests = useFriendStore.getState().sentRequests;
+                await Promise.all([getAllFriendsRequest(), getFriendList()]);
+                const { sentRequests, friends } = useFriendStore.getState();
                 const isAlreadySent = sentRequests.some((request) =>
                     request.userId
                         ? request.userId === user._id
                         : request.username.toLowerCase() === user.userName.toLowerCase()
                 );
+                const isAlreadyFriend = friends.some((friend) =>
+                    friend._id === user._id ||
+                    friend.username.toLowerCase() === user.userName.toLowerCase()
+                );
 
                 setAlreadySent(isAlreadySent);
+                setAlreadyFriend(isAlreadyFriend);
                 setIsFound(true);
                 setSearchUser(user);
-                setSearchUserName(userName);
             } else {
                 setIsFound(false);
                 setSearchUser(null);
                 setAlreadySent(false);
+                setAlreadyFriend(false);
             }
         } catch(error) {
             console.error("Error searching for user:", error);
             setIsFound(false);
             setSearchUser(null);
             setAlreadySent(false);
+            setAlreadyFriend(false);
         }
      }
     );
@@ -86,6 +92,10 @@ const AddFriendModal = () => {
         }
         if (alreadySent) {
             toast.info("You already sent a friend request to this user.");
+            return;
+        }
+        if (alreadyFriend) {
+            toast.info("Bạn và người này đã là bạn bè.");
             return;
         }
         try {
@@ -108,8 +118,8 @@ const AddFriendModal = () => {
         reset();
         setIsFound(null);
         setSearchUser(null);
-        setSearchUserName("");
         setAlreadySent(false);
+        setAlreadyFriend(false);
     }
 
     const handleBackToSearch = () => {
@@ -137,7 +147,6 @@ const AddFriendModal = () => {
                         userNameValue={userNameValue}
                         onSubmit={handleSearch}
                         isFound={isFound}
-                        searchUserName={searchUserName}
                         onCancel={handleReset}
                     />
                     </>}
@@ -149,6 +158,7 @@ const AddFriendModal = () => {
                         watch={watch}
                         foundUser={searchUser}
                         alreadySent={alreadySent}
+                        alreadyFriend={alreadyFriend}
                         onSubmit={handleSendRequest}
                         onBack={handleBackToSearch}
                     />

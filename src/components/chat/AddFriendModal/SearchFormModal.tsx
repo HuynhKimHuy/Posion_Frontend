@@ -12,11 +12,10 @@ interface SearchFormProps {
     loading: boolean;
     userNameValue: string;
     isFound: boolean  | null;
-    searchUserName: string;
     onSubmit:(e: React.FormEvent<HTMLFormElement>) => void;
     onCancel: () => void;
 }
-const SearchForm = ({ register, errors, loading, userNameValue, isFound, searchUserName, onSubmit, onCancel }: SearchFormProps) => {
+const SearchForm = ({ register, errors, loading, userNameValue, isFound, onSubmit, onCancel }: SearchFormProps) => {
     return (
         <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">

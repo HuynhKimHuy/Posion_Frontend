@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import type { ConversationResponse, Message } from "@/types/chat";
+import type { Conversation, ConversationResponse, Message } from "@/types/chat";
 
 interface fetchMessageProps {
     messages:Message[]
@@ -35,5 +35,19 @@ export const sendGroupMessage = async( conversationId: string, content: string ,
 
 export const markConversationAsRead = async (conversationId: string) => {
     const res = await api.post(`/conversation/${conversationId}/read`)
+    return res.data.metadata
+}
+
+export const createConversation = async (
+    type: "direct" | "group",
+    name: string,
+    recipientIds: string[]
+): Promise<Conversation> => {
+    const memberId = recipientIds
+    const payload = type === "group"
+        ? { type, name, memberId }
+        : { type, memberId }
+
+    const res = await api.post(`/conversation`, payload)
     return res.data.metadata
 }

@@ -2,7 +2,14 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { chatState } from "@/types/store"
 import type { Conversation, Message } from "@/types/chat"
-import { fetchConversations, fetchMessages, markConversationAsRead, sendDirectMessage, sendGroupMessage } from "@/service/chatSevice"
+import {
+	fetchConversations,
+	fetchMessages,
+	markConversationAsRead,
+	sendDirectMessage,
+	sendGroupMessage,
+	createConversation as createConversationApi,
+} from "@/service/chatSevice"
 import { useAuthStore } from "./useAuthStore"
 
 // ─── Read-sync guards ─────────────────────────────────────────────────────────
@@ -197,6 +204,44 @@ export const useChatStore = create<chatState>()(
 				const uid = useAuthStore.getState().user?._id
 				set((s) => ({ conversations: upsert(s.conversations, conversation, uid, s.activeConversationId) }))
 			},
+			addConversation: (convo) => {
+				set((state) => {
+					const exists = state.conversations.some((c) => String(c._id) === String(convo._id))
+					if (exists) return state
+
+					return {
+						conversations: [convo, ...state.conversations],
+					}
+				})
+			},
+			createConversation: async (type, name, recipientIds) => {
+				if (type === "direct" && recipientIds.length === 1) {
+					const friendId = String(recipientIds[0])
+					const existingConversation = get().conversations.find(
+						(conversation) =>
+							conversation.type === "direct" &&
+							conversation.participants.some((participant) => String(participant.userId) === friendId)
+					)
+
+					if (existingConversation) {
+						set({ activeConversationId: existingConversation._id })
+						return existingConversation
+					}
+				}
+
+				const conversation = await createConversationApi(type, name, recipientIds)
+				if (!conversation?._id) {
+					return conversation
+				}
+
+				// API create response may not include populated participant names.
+				await get().loadConversations()
+				const hydratedConversation =
+					get().conversations.find((item) => String(item._id) === String(conversation._id)) ?? conversation
+
+				set({ activeConversationId: hydratedConversation._id })
+				return hydratedConversation
+			}
 		}),
 		{ name: "chat-storage", partialize: (s) => ({ conversations: s.conversations }) }
 	)

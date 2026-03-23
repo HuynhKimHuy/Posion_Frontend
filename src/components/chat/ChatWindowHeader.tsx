@@ -26,7 +26,7 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
     }
 
     const title = chat.type === "direct"
-        ? (otherUser?.displayName || "Unknown User")
+        ? (otherUser?.displayName || otherUser?.userName || "Unknown User")
         : (chat.name || "Unnamed Group")
 
     const subTitle = chat.type === "direct"
@@ -46,7 +46,7 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
                         {
                             chat.type === "direct" ? (<>
                                 <UserAvatar type={"sidebar"}
-                                    name={otherUser?.displayName || "Unknown User"}
+                                    name={otherUser?.displayName || otherUser?.userName || "Unknown User"}
                                     imageUrl={otherUser?.avatarUrl || undefined}
                                     className=""
                                 />

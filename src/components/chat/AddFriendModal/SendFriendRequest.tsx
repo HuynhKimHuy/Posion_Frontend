@@ -14,6 +14,7 @@ export interface SendFriendRequestProps {
     watch: UseFormWatch<AddFriendModalProps>
     foundUser: User | null;
     alreadySent: boolean;
+    alreadyFriend: boolean;
     onSubmit: (e: FormEvent<HTMLFormElement>) => void;
     onBack: () => void;
 }
@@ -24,6 +25,7 @@ const SendFriendRequest = ({
         watch,
     foundUser,
     alreadySent,
+        alreadyFriend,
     onSubmit,
     onBack,
     loading
@@ -61,7 +63,23 @@ const SendFriendRequest = ({
             </div>
         </div>
 
-        {alreadySent ? (
+        {alreadyFriend ? (
+            <div className="space-y-4">
+                <div className="rounded-lg border border-emerald-300/60 bg-emerald-50 p-4 text-center dark:border-emerald-500/40 dark:bg-emerald-500/10">
+                    <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                        Đã kết bạn
+                    </p>
+                    <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-300/80">
+                        Bạn và {finalName} đã là bạn bè
+                    </p>
+                </div>
+                <DialogFooter>
+                    <Button type="button" className="flex-1 glass" onClick={onBack}>
+                        Quay lại
+                    </Button>
+                </DialogFooter>
+            </div>
+        ) : alreadySent ? (
             <div className="space-y-4">
                 <div className="rounded-lg border border-amber-300/60 bg-amber-50 p-4 text-center dark:border-amber-500/40 dark:bg-amber-500/10">
                     <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
