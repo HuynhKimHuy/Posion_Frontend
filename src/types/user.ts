@@ -8,6 +8,7 @@ export interface User {
     coverUrl?: string;
     bio?: string;
     roles: string;
+    verfify?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }

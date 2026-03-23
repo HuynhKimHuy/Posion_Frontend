@@ -1,5 +1,12 @@
 import api from "@/lib/axios";
 
+export interface UpdateProfilePayload {
+  bio?: string;
+  firstName?: string;
+  lastName?: string;
+  userName?: string;
+}
+
 const withAuthConfig = (accessToken: string) => ({
   withCredentials: true,
   headers: {
@@ -8,8 +15,8 @@ const withAuthConfig = (accessToken: string) => ({
 });
 
 export const profileService = {
-  updateProfile: async (accessToken: string, bio: string) => {
-    const res = await api.patch("/user/me", { bio }, withAuthConfig(accessToken));
+  updateProfile: async (accessToken: string, payload: UpdateProfilePayload) => {
+    const res = await api.patch("/user/me", payload, withAuthConfig(accessToken));
     return res.data.metadata;
   },
 

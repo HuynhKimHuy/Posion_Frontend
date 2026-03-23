@@ -1,5 +1,6 @@
 import type { Conversation, Message } from "./chat"
 import type { Friend, FriendRequest, User } from "./user"
+import type { UpdateProfilePayload } from "@/service/profileService"
 
 export interface authState {
     accessToken: string | null,
@@ -14,7 +15,7 @@ export interface authState {
     logOut: () => Promise<void>
     fetchMe: (accessToken: string) => Promise<any>
     refresh: () => Promise<string|null>
-    updateProfile: (bio: string) => Promise<User | null>
+    updateProfile: (payload: UpdateProfilePayload) => Promise<User | null>
     updateCoverImage: (file: File) => Promise<User | null>
 
 }
@@ -24,7 +25,6 @@ export interface themeState {
     toggleTheme: () => void,
     setTheme: (isDark: boolean) => void
 }
-
 
 export interface chatState {
     conversations: Conversation[],
@@ -49,6 +49,7 @@ export interface chatState {
     addConversation:(conversation:Conversation) => void
     createConversation: (type: "direct" | "group", name: string, recipientIds: string[]) => Promise<Conversation>
 }
+
 export interface friendState {
     loading: boolean,
     friends: Friend[],
@@ -62,4 +63,8 @@ export interface friendState {
     getFriendList: () => Promise<void>
     
 
+}
+
+export interface UserState{
+    updateAvatar: (formData: FormData) => Promise<User | null>
 }

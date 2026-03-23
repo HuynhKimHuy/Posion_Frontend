@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import ProfileCard from "./ProfileCard";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -12,6 +12,9 @@ const ProfileDialog = ({ open, setOpen }: ProfileDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="overflow-y-auto border-0 bg-transparent p-0 shadow-2xl">
+                <DialogHeader className="sr-only">
+                    <DialogTitle>Profile & Settings</DialogTitle>
+                </DialogHeader>
                 <div className="bg-gradient-glass">
                     <div className="mx-auto max-w-4xl p-4">
                         <div className="mb-6">

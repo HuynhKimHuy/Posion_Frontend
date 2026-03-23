@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { toast } from "sonner";
 import { authService } from "@/service/authService";
 import { profileService } from "@/service/profileService";
+import type { UpdateProfilePayload } from "@/service/profileService";
 import type { authState } from "@/types/store";
 import { useChatStore } from "./useChatStore";
 
@@ -106,12 +107,12 @@ export const useAuthStore = create<authState>()(
           }
         },
 
-        updateProfile: async (bio: string) => {
+        updateProfile: async (payload: UpdateProfilePayload) => {
         try {
           set({ loading: true });
           const token = requireAccessToken();
 
-          const updatedUser = await profileService.updateProfile(token, bio);
+          const updatedUser = await profileService.updateProfile(token, payload);
           set({ user: updatedUser });
           toast.success("Cập nhật hồ sơ thành công");
           return updatedUser;
