@@ -34,7 +34,6 @@ export const useAuthStore = create<authState>()(
           });
           localStorage.removeItem('auth-storage');
           localStorage.removeItem('chat-storage');
-          localStorage.removeItem('refresh-token');
           useChatStore.getState().resetChatState();
         },
 
@@ -55,12 +54,8 @@ export const useAuthStore = create<authState>()(
             set({ loading: true });
             const res = await authService.signIn(email, password);
             const accessToken = res?.metadata?.tokens?.accessToken;
-            const refreshToken = res?.metadata?.tokens?.refreshToken;
 
             if (!accessToken) throw new Error("Missing access token");
-            if (refreshToken) {
-              localStorage.setItem('refresh-token', refreshToken);
-            }
             set({ accessToken });
             await get().fetchMe(accessToken);
 
@@ -155,7 +150,6 @@ export const useAuthStore = create<authState>()(
     {
       name: "auth-storage",
       partialize: (state) => ({
-        accessToken: state.accessToken,
         user: state.user,
       })
     }

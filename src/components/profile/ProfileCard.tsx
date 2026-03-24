@@ -75,6 +75,10 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
         avatarInputRef.current?.click()
     }
 
+    const resetDraftFromUser = () => {
+        setDraftProfile(defaultFormValues)
+    }
+
     const openCoverPicker = () => {
         coverInputRef.current?.click()
     }
@@ -145,7 +149,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
     }
 
     const handleStartEdit = () => {
-        setDraftProfile(defaultFormValues)
+        resetDraftFromUser()
         setIsEditingBio(true)
     }
 
@@ -160,25 +164,25 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
     }
 
     const handleCancelBioEdit = () => {
-        setDraftProfile(defaultFormValues)
+        resetDraftFromUser()
         setIsEditingBio(false)
     }
 
-    return(
+    return (
         <div className="w-full overflow-hidden rounded-2xl border border-white/20 bg-card/70 shadow-xl backdrop-blur-sm">
-            <div className="relative h-48 w-full overflow-hidden border-b border-white/20 bg-linear-to-r from-sky-500/25 via-cyan-400/15 to-emerald-400/20">
+            <div className="relative h-40 w-full overflow-hidden border-b border-white/20 bg-linear-to-r from-sky-500/25 via-cyan-400/15 to-emerald-400/20 sm:h-48">
                 {coverImage ? (
                     <img src={coverImage} alt="Cover" className="h-full w-full object-cover opacity-85" />
                 ) : (
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.32),transparent_45%),linear-gradient(120deg,rgba(56,189,248,0.35),rgba(16,185,129,0.22),rgba(14,165,233,0.28))]" />
                 )}
                 <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute right-4 top-4 z-10">
+                <div className="absolute right-3 top-3 z-10 sm:right-4 sm:top-4">
                     <Button
                         type="button"
                         size="sm"
                         variant="secondary"
-                        className="rounded-full"
+                        className="rounded-full px-3"
                         onClick={openCoverPicker}
                         disabled={loading || coverUploading}
                     >
@@ -195,13 +199,13 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
                 </div>
             </div>
 
-            <div className="relative px-6 pb-6">
-                <div className="-mt-14 flex flex-wrap items-end justify-between gap-4">
-                    <div className="flex items-end gap-4">
+            <div className="relative px-4 pb-5 sm:px-6 sm:pb-6">
+                <div className="-mt-12 flex flex-wrap items-end justify-between gap-4 sm:-mt-14">
+                    <div className="flex items-end gap-3 sm:gap-4">
                         <div className="relative">
-                            <Avatar className="size-28 border-4 border-background shadow-md">
+                            <Avatar className="size-24 border-4 border-background shadow-md sm:size-28">
                                 <AvatarImage src={avatarImage} alt={displayName} />
-                                    <AvatarFallback className="text-lg font-semibold">{getProfileInitials(displayName)}</AvatarFallback>
+                                <AvatarFallback className="text-lg font-semibold">{getProfileInitials(displayName)}</AvatarFallback>
                             </Avatar>
                             <Button
                                 type="button"
@@ -220,8 +224,8 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
                                 onChange={(event) => void handlePickAvatar(event)}
                             />
                         </div>
-                        <div className="pb-2">
-                            <h2 className="text-xl font-bold leading-tight">{displayName}</h2>
+                        <div className="pb-1 sm:pb-2">
+                            <h2 className="text-lg font-bold leading-tight sm:text-xl">{displayName}</h2>
                             <p className="text-sm text-muted-foreground">@{user.userName}</p>
                             <p className="text-xs text-muted-foreground">{user.email}</p>
                             {avatarUploading ? <p className="text-xs text-cyan-700">Dang tai avatar...</p> : null}
@@ -230,7 +234,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
                 </div>
             </div>
 
-            <div className="space-y-4 px-6 pb-6">
+            <div className="space-y-4 px-4 pb-5 sm:px-6 sm:pb-6">
                 <div className="grid gap-3 rounded-xl border bg-background/70 p-4 sm:grid-cols-3">
                     <div className="rounded-lg bg-muted/40 p-3">
                         <p className="text-xs uppercase tracking-wide text-muted-foreground">Vai tro</p>
@@ -255,7 +259,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Thong tin ho so</h3>
                     {!isEditingBio ? (
                         <Button type="button" variant="outline" size="sm" onClick={handleStartEdit}>
@@ -359,7 +363,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
                 )}
             </div>
 
-            <div className="px-6 pb-6">
+            <div className="px-4 pb-5 sm:px-6 sm:pb-6">
                 <p className="rounded-lg border border-dashed border-cyan-200/60 bg-cyan-50/55 p-3 text-xs text-cyan-800 dark:border-cyan-500/40 dark:bg-cyan-500/10 dark:text-cyan-300">
                     {PROFILE_COVER_HINT_TEXT}
                 </p>

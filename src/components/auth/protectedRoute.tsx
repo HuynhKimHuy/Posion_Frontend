@@ -30,16 +30,7 @@ const ProtectedRoute = () => {
         }
 
         if (token && !useAuthStore.getState().user) {
-          const me = await withTimeout(fetchMe(token));
-
-          // Token có thể đã hết hạn nhưng vẫn còn trong localStorage
-          // Thử refresh 1 lần để đồng bộ trạng thái đăng nhập sau khi refresh trang
-          if (!me) {
-            const newToken = await withTimeout(refresh());
-            if (newToken) {
-              await withTimeout(fetchMe(newToken));
-            }
-          }
+          await withTimeout(fetchMe(token));
         }
       } catch (error) {
         console.error("Init error:", error);
