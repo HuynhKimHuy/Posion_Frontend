@@ -3,36 +3,64 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useEffect } from "react";
 import { useState } from "react";
 
+const withTimeout = async <T,>(promise: Promise<T>, ms = 8000): Promise<T> => {
+  return await Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error("Auth init timeout")), ms);
+    }),
+  ]);
+};
+
 const ProtectedRoute = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
+  const user = useAuthStore((state) => state.user);
   const refresh = useAuthStore((state) => state.refresh);
   const fetchMe = useAuthStore((state) => state.fetchMe);
   const [starting, setStarting] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const init = async () => {
       try {
         let token = accessToken;
         if (!token) {
-          token = await refresh();
+          token = await withTimeout(refresh());
         }
+
         if (token && !useAuthStore.getState().user) {
-          await fetchMe(token);
+          const me = await withTimeout(fetchMe(token));
+
+          // Token có thể đã hết hạn nhưng vẫn còn trong localStorage
+          // Thử refresh 1 lần để đồng bộ trạng thái đăng nhập sau khi refresh trang
+          if (!me) {
+            const newToken = await withTimeout(refresh());
+            if (newToken) {
+              await withTimeout(fetchMe(newToken));
+            }
+          }
         }
       } catch (error) {
         console.error("Init error:", error);
       } finally {
-        setStarting(false);
+        if (mounted) {
+          setStarting(false);
+        }
       }
     }
-    init();
-  }, []);
+
+    void init();
+    return () => {
+      mounted = false;
+    };
+  }, [accessToken, fetchMe, refresh]);
 
   if (starting) {
     return <div className="w-screen h-screen flex items-center justify-center">Loading...</div>;
   }
-  
-  if (!useAuthStore.getState().accessToken) {
+
+  if (!accessToken || !user) {
     return <Navigate to="/signin" replace />;
   }
   return <Outlet />;

@@ -16,7 +16,14 @@ const ChatWindowLayout = () => {
     } = useChatStore()
     const selectedConversation = conversations.find(c => c._id === activeConversationId) ?? null
     if (!selectedConversation) {
-        return <ChatWellcome />
+        return (
+            <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">
+                <ChatWindowHeader />
+                <div className="flex-1 min-h-0 overflow-hidden p-3 md:p-4">
+                    <ChatWellcome />
+                </div>
+            </SidebarInset>
+        )
     }
     if (loading || !messages[selectedConversation._id]) {
         // return <ChatWindowSkeleton/>

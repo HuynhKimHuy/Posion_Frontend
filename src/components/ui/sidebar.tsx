@@ -162,6 +162,103 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const edgeSwipeStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null)
+  const closeSwipeStartRef = React.useRef<{ x: number; y: number } | null>(null)
+
+  React.useEffect(() => {
+    if (!isMobile || openMobile || side !== "left") {
+      return
+    }
+
+    const EDGE_HIT_ZONE = 28
+    const OPEN_SWIPE_DISTANCE = 64
+    const MAX_VERTICAL_DRIFT = 72
+    const MAX_GESTURE_TIME = 700
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) {
+        edgeSwipeStartRef.current = null
+        return
+      }
+
+      const touch = event.touches[0]
+      if (touch.clientX > EDGE_HIT_ZONE) {
+        edgeSwipeStartRef.current = null
+        return
+      }
+
+      edgeSwipeStartRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now(),
+      }
+    }
+
+    const onTouchEnd = (event: TouchEvent) => {
+      const start = edgeSwipeStartRef.current
+      edgeSwipeStartRef.current = null
+
+      if (!start || event.changedTouches.length === 0) {
+        return
+      }
+
+      const touch = event.changedTouches[0]
+      const dx = touch.clientX - start.x
+      const dy = Math.abs(touch.clientY - start.y)
+      const elapsed = Date.now() - start.time
+      const isMostlyHorizontal = Math.abs(dx) > dy * 1.2
+
+      if (
+        dx > OPEN_SWIPE_DISTANCE &&
+        dy < MAX_VERTICAL_DRIFT &&
+        isMostlyHorizontal &&
+        elapsed < MAX_GESTURE_TIME
+      ) {
+        setOpenMobile(true)
+      }
+    }
+
+    window.addEventListener("touchstart", onTouchStart, { passive: true })
+    window.addEventListener("touchend", onTouchEnd, { passive: true })
+
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart)
+      window.removeEventListener("touchend", onTouchEnd)
+    }
+  }, [isMobile, openMobile, setOpenMobile, side])
+
+  const onSidebarTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length !== 1) {
+      closeSwipeStartRef.current = null
+      return
+    }
+
+    const touch = event.touches[0]
+    closeSwipeStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const onSidebarTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!openMobile || side !== "left" || event.changedTouches.length === 0) {
+      closeSwipeStartRef.current = null
+      return
+    }
+
+    const start = closeSwipeStartRef.current
+    closeSwipeStartRef.current = null
+
+    if (!start) {
+      return
+    }
+
+    const touch = event.changedTouches[0]
+    const dx = touch.clientX - start.x
+    const dy = Math.abs(touch.clientY - start.y)
+    const isMostlyHorizontal = Math.abs(dx) > dy * 1.2
+
+    if (dx < -64 && dy < 72 && isMostlyHorizontal) {
+      setOpenMobile(false)
+    }
+  }
 
   if (collapsible === "none") {
     return (
@@ -192,6 +289,8 @@ function Sidebar({
             } as React.CSSProperties
           }
           side={side}
+          onTouchStart={onSidebarTouchStart}
+          onTouchEnd={onSidebarTouchEnd}
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
@@ -372,7 +471,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "beautiful-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
         className
       )}
       {...props}
@@ -567,7 +666,7 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+        "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         className
       )}
       {...props}

@@ -42,7 +42,12 @@ export const authService = {
         return res.data.metadata;
     },
     refresh: async () => {
-        const res = await api.post("/auth/refreshToken", {}, { withCredentials: true });
+        const fallbackRefreshToken = localStorage.getItem("refresh-token");
+        const payload = fallbackRefreshToken
+            ? { refreshToken: fallbackRefreshToken }
+            : {};
+
+        const res = await api.post("/auth/refreshToken", payload, { withCredentials: true });
         return res.data.metadata.tokens.accessToken;
     }
 
