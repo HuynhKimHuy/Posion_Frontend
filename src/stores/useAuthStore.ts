@@ -23,6 +23,9 @@ export const useAuthStore = create<authState>()(
         user: null,
         loading: false,
 
+        setUser: (user) => {
+          set({ user })
+        },
         clearState: () => {
           set({
             accessToken: null,
@@ -35,69 +38,69 @@ export const useAuthStore = create<authState>()(
         },
 
         signUp: async (userName, password, email, firstName, lastName) => {
-        try {
-          set({ loading: true });
-          await authService.signUp(userName, password, email, firstName, lastName);
-          toast.success("Đăng ký thành công!");
-        } catch (error) {
-          toast.error("Đăng ký thất bại");
-        } finally {
-          set({ loading: false });
-        }
+          try {
+            set({ loading: true });
+            await authService.signUp(userName, password, email, firstName, lastName);
+            toast.success("Đăng ký thành công!");
+          } catch (error) {
+            toast.error("Đăng ký thất bại");
+          } finally {
+            set({ loading: false });
+          }
         },
 
         signIn: async (email, password) => {
-        try {
-          set({ loading: true });
-          const res = await authService.signIn(email, password);
-          const accessToken = res?.metadata?.tokens?.accessToken;
+          try {
+            set({ loading: true });
+            const res = await authService.signIn(email, password);
+            const accessToken = res?.metadata?.tokens?.accessToken;
 
-          if (!accessToken) throw new Error("Missing access token");
-          set({ accessToken });
-          await get().fetchMe(accessToken);
+            if (!accessToken) throw new Error("Missing access token");
+            set({ accessToken });
+            await get().fetchMe(accessToken);
 
-          toast.success("Đăng nhập thành công!");
-          return true;
-        } catch (error) {
-          toast.error("Đăng nhập thất bại");
-          return false;
-        } finally {
-          set({ loading: false });
-        }
+            toast.success("Đăng nhập thành công!");
+            return true;
+          } catch (error) {
+            toast.error("Đăng nhập thất bại");
+            return false;
+          } finally {
+            set({ loading: false });
+          }
         },
 
         logOut: async () => {
-        try {
-          await authService.logOut();
-          toast.success("Đã đăng xuất");
-        } catch (error) {
-          toast.error("Lỗi khi đăng xuất");
-        } finally {
-          get().clearState();
-          window.location.href = "/signin";
-        }
+          try {
+            await authService.logOut();
+            toast.success("Đã đăng xuất");
+          } catch (error) {
+            toast.error("Lỗi khi đăng xuất");
+          } finally {
+            get().clearState();
+            window.location.href = "/signin";
+          }
         },
 
         fetchMe: async (accessToken: string) => {
-        try {
-          set({ loading: true });
-          const user = await authService.fetchMe(accessToken);
-          set({ user });
-          return user;
-        } catch (error) {
-          console.error("Fetch user error:", error);
-          return null;
-        } finally {
-          set({ loading: false });
-        }
+          try {
+            set({ loading: true });
+            const user = await authService.fetchMe(accessToken);
+            set({ user });
+            return user;
+          } catch (error) {
+            console.error("Fetch user error:", error);
+            return null;
+          } finally {
+            set({ loading: false });
+          }
         },
 
         refresh: async () => {
           try {
             set({ loading: true })
-          const newAccessToken = await authService.refresh();
-          set({ accessToken: newAccessToken });
-          return newAccessToken;
+            const newAccessToken = await authService.refresh();
+            set({ accessToken: newAccessToken });
+            return newAccessToken;
 
           } catch (error) {
             console.error("Refresh token error:", error);
@@ -108,39 +111,39 @@ export const useAuthStore = create<authState>()(
         },
 
         updateProfile: async (payload: UpdateProfilePayload) => {
-        try {
-          set({ loading: true });
-          const token = requireAccessToken();
+          try {
+            set({ loading: true });
+            const token = requireAccessToken();
 
-          const updatedUser = await profileService.updateProfile(token, payload);
-          set({ user: updatedUser });
-          toast.success("Cập nhật hồ sơ thành công");
-          return updatedUser;
-        } catch (error) {
-          console.error("Update profile error:", error);
-          toast.error("Cập nhật hồ sơ thất bại");
-          return null;
-        } finally {
-          set({ loading: false });
-        }
+            const updatedUser = await profileService.updateProfile(token, payload);
+            set({ user: updatedUser });
+            toast.success("Cập nhật hồ sơ thành công");
+            return updatedUser;
+          } catch (error) {
+            console.error("Update profile error:", error);
+            toast.error("Cập nhật hồ sơ thất bại");
+            return null;
+          } finally {
+            set({ loading: false });
+          }
         },
 
         updateCoverImage: async (file: File) => {
-        try {
-          set({ loading: true });
-          const token = requireAccessToken();
+          try {
+            set({ loading: true });
+            const token = requireAccessToken();
 
-          const updatedUser = await profileService.updateCoverImage(token, file);
-          set({ user: updatedUser });
-          toast.success("Cập nhật ảnh bìa thành công");
-          return updatedUser;
-        } catch (error) {
-          console.error("Update cover image error:", error);
-          toast.error("Không thể cập nhật ảnh bìa. Hãy chỉnh API sau.");
-          return null;
-        } finally {
-          set({ loading: false });
-        }
+            const updatedUser = await profileService.updateCoverImage(token, file);
+            set({ user: updatedUser });
+            toast.success("Cập nhật ảnh bìa thành công");
+            return updatedUser;
+          } catch (error) {
+            console.error("Update cover image error:", error);
+            toast.error("Không thể cập nhật ảnh bìa. Hãy chỉnh API sau.");
+            return null;
+          } finally {
+            set({ loading: false });
+          }
         }
       };
     },

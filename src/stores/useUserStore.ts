@@ -4,55 +4,33 @@ import { isAxiosError } from "axios";
 import { userService } from "@/service/userService";
 import type { UserState } from "@/types/store";
 import { useAuthStore } from "./useAuthStore";
-import { useChatStore } from "./useChatStore";
 
 export const userStore = create<UserState>(() => ({
     updateAvatar: async (formData: FormData) => {
         try {
-            const updatedUser = await userService.uploadAvatar(formData);
+            const { user, setUser } = useAuthStore.getState();
+            const data = await userService.uploadAvatar(formData);
 
-            // Cập nhật user trong auth store
-            useAuthStore.setState({ user: updatedUser });
-            // Đảm bảo toàn bộ thông tin user được đồng bộ (lấy lại từ API nếu cần)
-            const accessToken = useAuthStore.getState().accessToken;
-            if (accessToken) {
-                const freshUser = await useAuthStore.getState().fetchMe(accessToken);
-                if (freshUser) {
-                    useAuthStore.setState({ user: freshUser });
-                }
+            if (!user) {
+                return null;
             }
 
-            // Đồng bộ avatar vào các cuộc hội thoại để UI cập nhật ngay
-            const { conversations, setActiveConversation, activeConversationId } = useChatStore.getState();
-            const patchedConversations = conversations.map((conversation) => ({
-                ...conversation,
-                participants: conversation.participants.map((participant) =>
-                    participant.userId === updatedUser?._id
-                        ? { ...participant, avatarUrl: updatedUser?.avatarUrl }
-                        : participant
-                ),
-                lastMessage: conversation.lastMessage && conversation.lastMessage.sender
-                    ? {
-                        ...conversation.lastMessage,
-                        sender: conversation.lastMessage.sender._id === updatedUser?._id
-                            ? { ...conversation.lastMessage.sender, avatarUrl: updatedUser?.avatarUrl }
-                            : conversation.lastMessage.sender,
-                    }
-                    : conversation.lastMessage,
-            }));
-            useChatStore.setState({ conversations: patchedConversations });
-            if (activeConversationId) {
-                setActiveConversation(activeConversationId);
-            }
+            const updatedUser = {
+                ...user,
+                avatarUrl: data?.avatarUrl ?? user.avatarUrl,
+            };
 
-            toast.success("Cập nhật avatar thành công!");
+            setUser(updatedUser);
             return updatedUser;
         } catch (error) {
-            console.error("updateAvatar failed", error);
-            const message = isAxiosError(error)
-                ? error.response?.data?.message
-                : null;
-            toast.error(message || "Không thể cập nhật avatar");
+            console.log("Loi khi cap nhat avatar");
+
+            if (isAxiosError(error)) {
+                toast.error(error.response?.data?.message ?? "Failed to update avatar. Please try again.");
+            } else {
+                toast.error("Failed to update avatar. Please try again.");
+            }
+
             return null;
         }
     },

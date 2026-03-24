@@ -17,7 +17,7 @@ export interface authState {
     refresh: () => Promise<string|null>
     updateProfile: (payload: UpdateProfilePayload) => Promise<User | null>
     updateCoverImage: (file: File) => Promise<User | null>
-
+    setUser: (user: User) => void
 }
 
 export interface themeState {
@@ -67,4 +67,5 @@ export interface friendState {
 
 export interface UserState{
     updateAvatar: (formData: FormData) => Promise<User | null>
+
 }
